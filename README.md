@@ -13,6 +13,8 @@ Crawl Methodology
 -----------------
 We crawled the whole Common Crawl corpus, and for each website we built two scores : an open-data score, and a "french" score. If both are big enough, the website is kept to build the graph, with all its outgoing links (which are used to build edges of the graph). One the crawl is over and the websites selected, two files are generated : the first one contains the nodes, the second one contains the edges (which node is connected ti which one).
 
+**Important** : to build Java Project (in commonCrawl directory), you need to complete a configuration file with your Amazon information, located on _commonCrawl/src/main/resources/aws.properties_
+
 Categorization
 --------------
 The nodes are then categorized and qualified : type (Companies, associations/citizen, State) and function (Open-Data Speaker, Open-Data Dealer).
@@ -23,6 +25,6 @@ The resulting dataset is then loaded into Gephi, to be spatialized and visualize
 
 Graph view (draft)
 ------------------
-If you want to see some pictures of the draft Graph realized, **you can go into the preview repository**. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
+If you want to see some pictures of the draft Graph realized, **you can go into the preview directory**. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
 This preview will be soon completed with a dynamic general view of the graph, with categorized nodes, and a complete analysis of the results.
 
