@@ -2,7 +2,8 @@ opendata-graph
 ==============
 
 This project aims to crawl Common Crawl corpus in order to create a graph of french opendata websites
-**NB **: *this project is not yet finished, and will continue to evolve in the next few days.*
+
+**NB**: *this project is not yet finished, and will continue to evolve in the next few days.*
 
 French open-data websites Graph
 -------------------------------
@@ -19,3 +20,9 @@ The nodes are then categorized and qualified : type (Companies, associations/cit
 Visualization
 -------------
 The resulting dataset is then loaded into Gephi, to be spatialized and visualized.
+
+Graph view (draft)
+------------------
+If you want to see some pictures of the draft Graph realized, you can go into the preview repository. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
+This preview will be soon completed with a dynamic general view of the graph, with categorized nodes, and a complete analysis of the results.
+
