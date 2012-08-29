@@ -23,6 +23,6 @@ The resulting dataset is then loaded into Gephi, to be spatialized and visualize
 
 Graph view (draft)
 ------------------
-If you want to see some pictures of the draft Graph realized, you can go into the preview repository. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
+If you want to see some pictures of the draft Graph realized, **you can go into the preview repository**. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
 This preview will be soon completed with a dynamic general view of the graph, with categorized nodes, and a complete analysis of the results.
 
