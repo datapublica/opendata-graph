@@ -5,6 +5,10 @@ This project aims to crawl Common Crawl corpus in order to create a graph of fre
 
 **NB**: *this project is not yet finished, and will continue to evolve in the next few days.*
 
+Final results
+-------------
+Final results, with graph representation of the french opendata subgraph of the web is **viewable in graph directory** of this project.
+
 French open-data websites Graph
 -------------------------------
 Our project aims to build a subgraph of the web, consisting of the French websites mentioning open-data. This graph enables viewers to see popular websites and connections between them, to see which kind of entities communicate with the others (Companies, Non profits/Blogs, Government agencies). It is a good way to discover the actors of the French open-data, and how they relate to one another.
@@ -27,4 +31,5 @@ Graph view (draft)
 ------------------
 If you want to see some pictures of the draft Graph realized, **you can go into the preview directory**. You'll have access to an overview, an image of the core, and images of two mini-clusters separated from the main graph.
 This preview will be soon completed with a dynamic general view of the graph, with categorized nodes, and a complete analysis of the results.
+These pictures are now obsoletes compared to the one in graph directory.
 
