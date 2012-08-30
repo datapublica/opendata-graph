@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.aggregation;
 
 import java.io.IOException;
@@ -11,6 +8,10 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+/**
+ * Same as NumericAggregationMapper except that it is dedicated for a specific input in which the line patterns are :
+ * OPENDATA {site} {path} {count} and this mapper filters the keys by removing the {path} part
+ */
 public class NumericAggregationWithFilterMapper extends MapReduceBase implements
                 Mapper<LongWritable, Text, Text, LongWritable> {
 
@@ -20,21 +21,22 @@ public class NumericAggregationWithFilterMapper extends MapReduceBase implements
         // Read the value as a line
         String line = value.toString();
 
-        // Split the line into two splits
-        // Pattern : {domain} {pagesCount}
+        // Split the line
+        // Pattern : OPENDATA {site} {path} {count}
         String[] lineItems = line.split("\t");
 
-        // Get the domain
+        // Build the filtered output key
         String outputKey = lineItems[0];
 
         for (int i = 1; i < lineItems.length - 1; i++) {
+            // skip the 3rd part
             if (i == 2) {
                 continue;
             }
             outputKey = outputKey + "\t" + lineItems[i];
         }
 
-        // Get the pages count
+        // Consider the last split as a long value (the one to be aggregated)
         long outputValue = Long.parseLong(lineItems[lineItems.length - 1]);
 
         // Output results

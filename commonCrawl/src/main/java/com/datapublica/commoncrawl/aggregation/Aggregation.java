@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.aggregation;
 
 import java.io.IOException;
@@ -17,8 +14,6 @@ public class Aggregation {
 
     private final static Log LOG = LogFactory.getLog(Aggregation.class);
 
-    private static final String DP_BUCKET_PREFIX = "s3n://dp-commoncrawl/";
-
     public static void main(String[] args) {
 
         Loggers.setup();
@@ -30,9 +25,9 @@ public class Aggregation {
         if (args.length == 2) {
 
             // Append the input path with the first argument
-            aggregationInput = DP_BUCKET_PREFIX + args[0];
+            aggregationInput = JobHelper.DP_BUCKET_PREFIX + args[0];
             // Append the output path with the second argument
-            aggregationOutput = DP_BUCKET_PREFIX + args[1];
+            aggregationOutput = JobHelper.DP_BUCKET_PREFIX + args[1];
 
             // Run job
             RunNumericAggregation(aggregationInput, aggregationOutput);
@@ -43,6 +38,12 @@ public class Aggregation {
 
     }
 
+    /**
+     * Used to run a numeric aggregation on similar input from different locations and merge them all to one location
+     * 
+     * @param aggregationInput Input path
+     * @param aggregationOutput Output path
+     */
     public static void RunNumericAggregation(String aggregationInput, String aggregationOutput) {
         JobConf aggregationJob = new JobConf();
 
@@ -60,6 +61,12 @@ public class Aggregation {
         }
     }
 
+    /**
+     * Used to run a textual aggregation on similar input from different locations and merge them all to one location
+     * 
+     * @param aggregationInput Input path
+     * @param aggregationOutput Output path
+     */
     public static void RunTextualAggregation(String aggregationInput, String aggregationOutput) {
         JobConf aggregationJob = new JobConf();
 
@@ -77,6 +84,12 @@ public class Aggregation {
         }
     }
 
+    /**
+     * Used to run a numeric aggregation on specific input. See NumericAggregationWithFilterMapper class doc for details
+     * 
+     * @param aggregationInput Input path
+     * @param aggregationOutput Output path
+     */
     public static void RunNumericAggregationWithFilter(String aggregationInput, String aggregationOutput) {
         JobConf aggregationJob = new JobConf();
 

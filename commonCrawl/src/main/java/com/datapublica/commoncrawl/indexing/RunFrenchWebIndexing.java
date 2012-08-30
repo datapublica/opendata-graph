@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.indexing;
 
 import java.io.IOException;
@@ -67,7 +64,7 @@ public class RunFrenchWebIndexing {
     }
 
     /**
-     * Run the language statistics on a specific subset or common crawl and output the results to a specified output
+     * Run the French web indexing job on a specific subset of common crawl and output the results to a specified output
      * path.
      * 
      * @param args Usage : {segmentID}/[textData-{fileID}] outputPath
@@ -84,7 +81,7 @@ public class RunFrenchWebIndexing {
         JobHelper.ConfigureNumericOutputJob(jobConf, inputPath, outputPath);
 
         // Set custom configuration
-        jobConf.setMapperClass(FrenchWebIndexingMapper.class);
+        jobConf.setMapperClass(FrenchWebIndexMapper.class);
         jobConf.setInputFormat(SequenceFileInputFormat.class);
 
         try {
@@ -98,6 +95,9 @@ public class RunFrenchWebIndexing {
         }
     }
 
+    /**
+     * Run the French web indexing job on a the full Common Crawl corpus
+     */
     private void runOnFullCorpus() {
         List<String> validSegments = JobHelper.getValidSegments();
 
@@ -118,7 +118,7 @@ public class RunFrenchWebIndexing {
 
             // Set custom configuration
             jobConf.setInputFormat(SequenceFileInputFormat.class);
-            jobConf.setMapperClass(FrenchWebIndexingMapper.class);
+            jobConf.setMapperClass(FrenchWebIndexMapper.class);
 
             // Run the job
             LOG.info("=================================");
@@ -140,6 +140,9 @@ public class RunFrenchWebIndexing {
         }
     }
 
+    /**
+     * Run the open data index filtering job that filters the open data sites index out of the French web index
+     */
     private void runOpenDataIndexFiltering() {
         // Append the input path from the first argument
         String inputPath = JobHelper.DP_BUCKET_PREFIX + FINAL_OUTPUT_PATH;

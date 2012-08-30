@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.utils;
 
 import java.io.File;

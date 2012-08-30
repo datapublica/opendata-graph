@@ -1,11 +1,6 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.indexing;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -16,19 +11,18 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.LangDetectException;
-import com.google.common.net.InternetDomainName;
-
 import com.datapublica.commoncrawl.utils.LanguageDetector;
+import com.datapublica.commoncrawl.utils.MapHelper;
 
 /**
- * Mapping class that produces the normalized domain name and a count of '1' for every successfully retrieved URL in the
- * Common Crawl corpus. Actually we consider only the url passed as a Key for the map method. Further we might process
- * the json metadata contained in Value
+ * Mapping class that detects the language of a text given as a value and then considers only the the French language
+ * pages, then looks up for Open Data keywords in these pages. It outputs the full list of all the French websites with
+ * their paths in Common Crawl AWS public dataset. In addition it outputs the ones among them which talk about open data
  */
-public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable> {
+public class FrenchWebIndexMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable> {
 
     // create a counter group for Mapper-specific statistics
-    private static final String COUNTER_GROUP = "Language detection statistics";
+    private static final String COUNTER_GROUP = "French Web Indexing Metrics";
 
     private static final String INVALID_URLS = "Invalid urls";
 
@@ -48,8 +42,13 @@ public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Tex
 
     private static final String INPUT_FILE_PARAMETER = "map.input.file";
 
+    private static final String PATH_PREFIX = "s3n://aws-publicdatasets/common-crawl/parse-output/segment/";
+
     private static final LongWritable one = new LongWritable(1);
 
+    /**
+     * List of open data words used by the French speaking communities
+     */
     private static final String[] openDataWords = { "opendata", "open-data", "open data", "donnée publique",
                     "données publiques", "donnée ouverte", "données ouvertes", "jeux de données", "jeu de données",
                     "catalogue de données", "explorer les données", "donnée libérée", "données libérées" };
@@ -57,16 +56,17 @@ public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Tex
     private String filePath;
 
     public void configure(JobConf conf) {
+        // Get the current input's file path
         filePath = conf.get(INPUT_FILE_PARAMETER);
     }
 
     public void map(Text key, Text value, OutputCollector<Text, LongWritable> output, Reporter reporter)
                     throws IOException {
 
-        // Use the URLs to gather TLD-language statistics
+        // Get the url
         String url = key.toString();
 
-        // Get the value as the text
+        // Get the value as the page text
         String pageText = value.toString();
 
         // If the page is empty than ignore (no title, no meta tags, and no content)
@@ -76,21 +76,10 @@ public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Tex
         }
 
         try {
+            // Gather the site from valid non-IP host name
+            String website = MapHelper.getWebsiteFromUrl(url);
 
-            // Gather the host name
-            URI uri = new URI(url);
-
-            String host = StringUtils.trimToNull(uri.getHost());
-
-            // Skip empty host names
-            if (host == null) {
-                throw new URISyntaxException(url, INVALID_URLS);
-            }
-
-            // Gather the domain object from a valid non-IP host name
-
-            if (InternetDomainName.isValid(host)) {
-                InternetDomainName domainObj = InternetDomainName.from(host);
+            if (website != null) {
 
                 // Code for LangDetect Detection
                 Detector detector = LanguageDetector.createDetector();
@@ -99,17 +88,20 @@ public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Tex
                 // caught bellow and reported as a metric
                 String language = detector.detect();
 
-                // output French domains
+                // output French sites only
                 if (language.equals(FR)) {
 
-                    // Output index entry
-                    output.collect(new Text(PATH + domainObj.name() + TAB + filePath), one);
+                    // Clean prefix since it is redundant and it risks explose the output size
+                    filePath = StringUtils.remove(filePath, PATH_PREFIX);
 
-                    // Open data lookup
+                    // Output index entry
+                    output.collect(new Text(PATH + website + TAB + filePath), one);
+
+                    // Open data keywords lookup
                     String text = value.toString();
                     for (String keyword : openDataWords) {
                         if (StringUtils.containsIgnoreCase(text, keyword)) {
-                            output.collect(new Text(OPENDATA + domainObj.name() + TAB + filePath), one);
+                            output.collect(new Text(OPENDATA + website + TAB + filePath), one);
                             reporter.incrCounter(COUNTER_GROUP, OPENDATA_PAGES, 1);
                             break;
                         }
@@ -117,11 +109,9 @@ public class FrenchWebIndexingMapper extends MapReduceBase implements Mapper<Tex
                 }
 
             } else {
-                throw new URISyntaxException(url, INVALID_URLS);
+                reporter.incrCounter(COUNTER_GROUP, INVALID_URLS, 1);
             }
 
-        } catch (URISyntaxException ex) {
-            reporter.incrCounter(COUNTER_GROUP, INVALID_URLS, 1);
         } catch (LangDetectException ex) {
             reporter.incrCounter(COUNTER_GROUP, UNDETECTED, 1);
         }

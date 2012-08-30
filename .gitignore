@@ -4,3 +4,10 @@
 *.jar
 *.war
 *.ear
+
+commonCrawl/src/main/.DS_Store
+.DS_Store
+commonCrawl/target/
+commonCrawl/.settings/
+commonCrawl/.project
+commonCrawl/.classpath

@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.indexing;
 
 import java.io.IOException;
@@ -13,6 +10,12 @@ import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
 
+/**
+ * A Mapper used to filter out the OpenData sites paths from the raw french indexing output and generate their relative
+ * paths to metadata files. Important : this approach is based on the fact that all the urls in a given textData-{ID}
+ * are the same in a metadata-{ID}. See the discussion group :
+ * https://groups.google.com/forum/?fromgroups=#!topic/common-crawl/3zllUZ1ZSrI
+ */
 public class OpenDataIndexMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
     private static final String OPENDATA = "OPENDATA";
@@ -20,8 +23,6 @@ public class OpenDataIndexMapper extends MapReduceBase implements Mapper<LongWri
     private static final String TEXT_PREFIX = "textData-";
 
     private static final String META_PREFIX = "metadata-";
-
-    private static final String PATH_PREFIX = "s3n://aws-publicdatasets/common-crawl/parse-output/segment/";
 
     public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
                     throws IOException {
@@ -31,14 +32,11 @@ public class OpenDataIndexMapper extends MapReduceBase implements Mapper<LongWri
 
         if (line.startsWith(OPENDATA)) {
 
-            // Split the line into two splits
+            // Split the line and get the sites and their paths
             String openDatasite = line.split("\t")[1];
-
             String textPath = line.split("\t")[2];
 
-            // Clean prefix
-            textPath = StringUtils.remove(textPath, PATH_PREFIX);
-
+            // Generate the relative path to the metadata files
             String metaPath = StringUtils.replace(textPath, TEXT_PREFIX, META_PREFIX);
 
             // Output results

@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.stats.opendata;
 
 import java.io.IOException;
@@ -20,8 +17,6 @@ public class RunOpenDataStats {
 
     private final static Log LOG = LogFactory.getLog(RunOpenDataStats.class);
 
-    private static final String DP_BUCKET_PREFIX = "s3n://dp-commoncrawl/";
-
     public static final String OPENDATA_STATS_PATH_SUFFIX = "opendata/stats/";
 
     public static final String OPENDATA_INDEX_PATH_SUFFIX = "opendata/index/";
@@ -30,21 +25,15 @@ public class RunOpenDataStats {
 
     public static final String AGGR_OUTPUT_PATH_SUFFIX = "emr/french-index-aggredated/";
 
-    /**
-     * Main method that calls a createAndRunJob() method to create and run the jobs
-     * 
-     * @param args : Usage : ${semgment}/[${metadataFile}] (metadataFile is optional)
-     * @throws IOException
-     */
     public static void main(String[] args) throws IOException {
 
         Loggers.setup();
 
         // Set output paths
-        String aggregationInput = DP_BUCKET_PREFIX + AGGR_OUTPUT_PATH_SUFFIX;
-        String aggregationOutput = DP_BUCKET_PREFIX + OPENDATA_SITES_PATH_SUFFIX;
-        String statsOutput = DP_BUCKET_PREFIX + OPENDATA_STATS_PATH_SUFFIX;
-        String indexOutput = DP_BUCKET_PREFIX + OPENDATA_INDEX_PATH_SUFFIX;
+        String aggregationInput = JobHelper.DP_BUCKET_PREFIX + AGGR_OUTPUT_PATH_SUFFIX;
+        String aggregationOutput = JobHelper.DP_BUCKET_PREFIX + OPENDATA_SITES_PATH_SUFFIX;
+        String statsOutput = JobHelper.DP_BUCKET_PREFIX + OPENDATA_STATS_PATH_SUFFIX;
+        String indexOutput = JobHelper.DP_BUCKET_PREFIX + OPENDATA_INDEX_PATH_SUFFIX;
 
         LOG.info("Extracting sites - pageCounts");
         Aggregation.RunNumericAggregationWithFilter(aggregationInput, aggregationOutput);

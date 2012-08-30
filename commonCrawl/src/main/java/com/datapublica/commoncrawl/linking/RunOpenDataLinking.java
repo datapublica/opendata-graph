@@ -1,6 +1,3 @@
-/*
- * Copyright (C) by Data Publica, All Rights Reserved.
- */
 package com.datapublica.commoncrawl.linking;
 
 import java.io.IOException;
@@ -39,12 +36,6 @@ public class RunOpenDataLinking {
 
     }
 
-    /**
-     * Runs the OpenData linking job depending on a subset or on the full corpus depending on the args. If there are no
-     * args passed, run across the whole corpus
-     * 
-     * @param args Usage : inputPath outputPath
-     */
     private void run() {
 
         // Run the job over the whole data set

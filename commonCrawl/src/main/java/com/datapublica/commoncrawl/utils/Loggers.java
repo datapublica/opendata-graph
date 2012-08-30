@@ -11,14 +11,13 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 /**
- * A custom static logger used to override HADOOP Logger without using a log4j configuration file (Quite complicated on
- * EMR) This logger uses a console appender instead of a file appender since EMR saves the console logs into a file and
- * puts it in the personal bucket. This class's Logger is static and it is statically configured
- * 
+ * A custom static logger used to override HADOOP Logger without using a log4j configuration file. This logger uses a
+ * console appender instead of a file appender since EMR saves the console logs into a file and puts it in the S3
+ * bucket.
  */
 public class Loggers {
 
- // Static configuration using code instead of an external configuration file
+    // Static configuration using code instead of an external configuration file
     public static void setup() {
 
         // Name the logger's category

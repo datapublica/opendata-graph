@@ -14,7 +14,7 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 /**
  * Creates and configures statically a DetectorFactory and loads the languages profiles into it. Used to avoid
- * configuring the DetectorFactory each time a Detector needs to be created and also used to create a Detector
+ * reconfiguring the DetectorFactory each time a Detector needs to be created and also used to create a Detector
  */
 public class LanguageDetector {
 
@@ -25,37 +25,36 @@ public class LanguageDetector {
     /**
      * The threshold distance value to help the detector decide which language
      */
-    public static final double THRESHOLD = 0.5;
+    private static final double THRESHOLD = 0.5;
 
     static {
 
+        // Initialize logger
         Loggers.setup();
 
-        // Load the languages profiles (n-grams lists for each language)
+        // Load the language profiles (n-grams lists for each language)
         LOG.info("Loading language profiles");
         loadProfiles();
         DetectorFactory.setSeed(0);
     }
 
     /**
-     * Creates a Detector using the configured DetectorFactory initiated and configured statically in this class
+     * Creates a Detector using the configured {@link DetectorFactory} initialized and configured statically in this class
      * 
-     * @return Detector the instantiated detector
+     * @return {@link Detector} the instantiated detector
      */
     public static Detector createDetector() {
         try {
             return DetectorFactory.create(THRESHOLD);
         } catch (LangDetectException e) {
             LOG.error("Cannot create Detector", e);
+            return null;
         }
-        return null;
     }
 
     /**
-     * Loads the languages profiles which are bundled in a folder in the jar. Each profile is a separate JSON file named
-     * with the language ISO code and containing n-grams model for the language. This method iterates over all the
-     * languages list and adds each profile individually by passing the profile as a file argument. Because of the Jar
-     * file access limit, files are extracted to the system temporary directory then used to load profiles.
+     * This method iterates over all the languages list supported by this detector and loads them all to initialize the
+     * {@link DetectorFactory}
      */
     public static void loadProfiles() {
 
@@ -69,17 +68,23 @@ public class LanguageDetector {
             }
         }
 
-        // Finally load the profiles
-        // Unfortunately this function reads the passed files as an InputStream but doesn't take InputStream as an
-        // argument. Otherwise we could directly read the profiles from the jar
+        // Finally load all the profiles
         try {
             DetectorFactory.loadProfile(json_profiles);
         } catch (LangDetectException e) {
-            // Error if files could not be accessed or formats aren't correct (JSON)
+            // Error if files could not be accessed or their format is correct (JSON)
             LOG.error("Cannot load profiles", e);
         }
     }
 
+    /**
+     * Gets a language profile as a JSON string by loading it from its individual file. The language files are bundled
+     * in the lang-detect library jar
+     * 
+     * @param langCode ISO code of the language
+     * @return json language profile as a string
+     * @throws IOException if the profile file cannot be accessed
+     */
     private static String getLanguageProfile(String langCode) throws IOException {
         InputStream iStream = DetectorFactory.class.getClassLoader().getResourceAsStream("profiles/" + langCode);
         String profile = IOUtils.toString(iStream);

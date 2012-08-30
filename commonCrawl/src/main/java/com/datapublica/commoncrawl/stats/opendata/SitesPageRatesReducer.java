@@ -7,25 +7,18 @@ import java.util.Iterator;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.lib.MultipleOutputs;
 
+/**
+ * Reducer that gets a website name as a key and 2 pagecounts, supposing that one of them is the total page count of
+ * this site, and the second is the count of pages that talk about open data. The aim of this reducer is to filter the
+ * raw open data sites and output only the sites that have a total pagecount and openCount/total count beyond some
+ * thresholds. These thresholds were defined after a study on many sites.
+ */
 public class SitesPageRatesReducer extends MapReduceBase implements Reducer<Text, LongWritable, Text, DoubleWritable> {
-
-    private MultipleOutputs mos;
-
-    public void configure(JobConf conf) {
-
-        mos = new MultipleOutputs(conf);
-    }
-
-    public void close() throws IOException {
-        mos.close();
-    }
 
     public void reduce(Text key, Iterator<LongWritable> values, OutputCollector<Text, DoubleWritable> output,
                     Reporter reporter) throws IOException {
@@ -41,7 +34,8 @@ public class SitesPageRatesReducer extends MapReduceBase implements Reducer<Text
 
         if (pageCount[0] > 0 && pageCount[1] > 0) {
 
-            String outKey = key.toString();
+            String openDataSite = key.toString();
+
             // find the maximum
             double max = pageCount[0];
             double min = pageCount[1];
@@ -53,11 +47,11 @@ public class SitesPageRatesReducer extends MapReduceBase implements Reducer<Text
             // double outValue = min / max;
             double outValue = Double.valueOf(new DecimalFormat("#.##").format(min / max).replace(',', '.'));
 
-            // After analyzing results previously, we considered this threshold
+            // After analyzing many results previously, we considered this threshold
             if (max > 5) {
                 if (outValue > 0.5) {
                     DoubleWritable result = new DoubleWritable(outValue);
-                    output.collect(new Text(outKey + "\t" + min + "\t" + max), result);
+                    output.collect(new Text(openDataSite + "\t" + min + "\t" + max), result);
                 }
             }
         }
