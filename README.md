@@ -3,7 +3,7 @@ opendata-graph
 
 This project aims to crawl Common Crawl corpus in order to create a graph of french opendata websites
 
-**NB**: *this project is not yet finished, and will continue to evolve in the next few days.*
+The final results of this project are viewable on the website http://french-opendata.data-publica.com/index.html .
 
 Final results
 -------------
